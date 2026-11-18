@@ -1,0 +1,1 @@
+# intellex-curtifucate-assesment
