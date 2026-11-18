@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intellex Student Assessment</title>
+<style>
+:root{--bg:#f4f6f8;--panel:#fff;--ink:#17212b;--muted:#647282;--line:#e3e8ee;--accent:#315cce;--soft:#edf2ff;--good:#16845b;--warn:#a96a00;--bad:#b43c3c;--radius:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;background:var(--accent);color:white;font-weight:650}button.secondary{background:#edf0f4;color:#263445}button.danger{background:#fff0f0;color:#a52d2d}button.small{padding:7px 10px;font-size:13px}
+header{background:#172b46;color:#fff;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{font-size:20px;margin:0}header p{margin:3px 0 0;color:#cbd6e5;font-size:13px}
+.app{max-width:1200px;margin:auto;padding:20px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:18px}
+nav,.panel,.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}
+nav{padding:12px;height:max-content;position:sticky;top:12px}nav button{width:100%;text-align:left;background:transparent;color:#334155;margin:2px 0}nav button.active{background:var(--soft);color:var(--accent)}
+main{min-width:0}.pagehead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px;flex-wrap:wrap}.pagehead h2{margin:0;font-size:22px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.card{padding:15px}.metric{font-size:25px;font-weight:750;margin-top:5px}.label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.panel{padding:16px;margin-bottom:14px}.panel h3{margin:0 0 12px;font-size:17px}.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.between{justify-content:space-between}
+input,textarea{border:1px solid #cfd7e1;border-radius:9px;padding:10px;background:#fff;color:var(--ink);width:100%;min-width:0}input:focus,textarea:focus{outline:2px solid #cbd8ff;border-color:var(--accent)}textarea{min-height:65px;resize:vertical}
+.field{display:grid;gap:5px;min-width:0}.field label{font-size:12px;color:var(--muted);font-weight:700}
+.student-list{display:grid;gap:9px}.student{border:1px solid var(--line);border-radius:12px;padding:13px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.student strong{display:block}.student small{color:var(--muted)}
+.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#eef1f5;color:#465568;font-size:12px;font-weight:650}.pill.done{background:#e7f7ef;color:#13734f}.pill.pending{background:#fff5df;color:#956000}
+.category{border:1px solid var(--line);border-radius:12px;margin:10px 0;overflow:hidden;background:#fff}.cathead{padding:13px 14px;background:#f8fafc;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer}.cathead h3{margin:0;font-size:15px}.catbody{padding:12px}
+.criterion{border:1px solid var(--line);border-radius:11px;padding:13px;margin:10px 0}.criterion h4{margin:0;font-size:15px}.criterion .desc{font-size:13px;color:#4b5968;margin:8px 0}.criterion details{font-size:13px;color:#536171;margin:7px 0}.criterion summary{cursor:pointer;color:var(--accent);font-weight:650}.entry{display:grid;grid-template-columns:115px minmax(0,1fr);gap:10px;margin-top:10px}
+.score{font-weight:750;color:var(--accent)}.progress{height:7px;background:#e9edf2;border-radius:99px;overflow:hidden;margin-top:7px}.progress span{display:block;height:100%;background:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:9px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:11px;text-transform:uppercase}
+.hidden{display:none!important}.notice{font-size:12px;color:var(--muted);margin-top:8px}.empty{padding:24px;text-align:center;color:var(--muted)}
+@media(max-width:760px){.app{display:block;padding:12px}nav{position:static;display:flex;overflow:auto;gap:5px;margin-bottom:14px}nav button{white-space:nowrap;width:auto}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pagehead h2{font-size:19px}.entry{grid-template-columns:100px minmax(0,1fr)}header{padding:15px}.panel{padding:13px}}
+@media(max-width:390px){.entry{grid-template-columns:1fr}.student{align-items:flex-start}.grid{gap:8px}.card{padding:12px}}
+@media print{body{background:white}.app,header{display:block}.app{padding:0;max-width:none}nav,.no-print,button{display:none!important}.panel,.category,.criterion{break-inside:avoid;box-shadow:none}.catbody{display:block!important}.criterion details{display:block}.criterion details>*{display:block}header{background:white;color:#111;padding:0 0 15px}header p{color:#555}}
+</style>
+</head>
+<body>
+<header><div><h1>Intellex Assessment</h1><p>Student competency evaluation · 5 categories · 500 marks</p></div><div class="row no-print"><button class="secondary" onclick="backup()">Backup JSON</button><button class="secondary" onclick="document.getElementById('restoreFile').click()">Restore</button><input id="restoreFile" type="file" accept="application/json" class="hidden" onchange="restore(event)"></div></header>
+<div class="app">
+<nav class="no-print">
+<button id="nav-dashboard" class="active" onclick="showPage('dashboard')">⌂ Dashboard</button>
+<button id="nav-assessment" onclick="showPage('assessment')">✓ Assess students</button>
+<button id="nav-rubric" onclick="showPage('rubric')">⚙ Edit assessment rubric</button>
+</nav>
+<main>
+<section id="page-dashboard">
+<div class="pagehead"><h2>Dashboard</h2><button onclick="addStudent()">＋ Add student</button></div>
+<div class="grid">
+<div class="card"><div class="label">Total students</div><div class="metric" id="m-students">0</div></div>
+<div class="card"><div class="label">Completed</div><div class="metric" id="m-completed">0</div></div>
+<div class="card"><div class="label">Pending</div><div class="metric" id="m-pending">0</div></div>
+<div class="card"><div class="label">Average score</div><div class="metric" id="m-average">—</div></div>
+</div>
+<div class="panel"><div class="pagehead"><h3>Students</h3><div class="row no-print"><button class="secondary small" onclick="exportCSV()">Export Excel CSV</button></div></div><div id="students" class="student-list"></div></div>
+</section>
+<section id="page-assessment" class="hidden">
+<div class="pagehead"><div><h2 id="assess-title">Student assessment</h2><div class="muted" id="assess-subtitle"></div></div><div class="row no-print"><button class="secondary" onclick="showPage('dashboard')">Back</button><button onclick="window.print()">Print / Save PDF</button></div></div>
+<div id="assessment-content"></div>
+<div class="panel"><div class="row between"><div><div class="label">Overall result</div><div class="metric" id="overall">—</div><div class="muted" id="overall-status"></div></div><div><div class="label">QR rating</div><div class="metric" id="qr">—</div></div></div><div class="progress"><span id="overall-progress" style="width:0"></span></div></div>
+</section>
+<section id="page-rubric" class="hidden">
+<div class="pagehead"><h2>Edit assessment rubric</h2><button onclick="saveRubric()">Save rubric</button></div>
+<div class="panel"><p class="muted">Edit criterion names, maximum marks, evaluation explanations and fallback tasks. Existing student marks are retained. Category totals should remain 100 and the overall total 500 for the official QR calculation.</p><div id="rubric-editor"></div></div>
+</section>
+</main></div>
+<script>
+const initial = [
+{name:"Technical Capability",items:[
+["Project Execution",25,"Converts requirements/design into working project; completes features correctly.","2–4 hr mini project: Build landing page from design (desktop + mobile). Evaluate completion, correctness, independence."],
+["Code Quality",15,"Clean structure, proper naming, reusable components, readable code, avoids bloat.","Provide messy React repo: Refactor code and explain what you changed and why."],
+["Technology Knowledge",15,"Uses claimed tech proficiently rather than just listing buzzwords.","10–15 min task: Create React component fetching data with loading/error states. Explain live."],
+["Git / GitHub",10,"Meaningful commits, branch workflow, PR/push, repo organization, README quality.","Git exercise: Clone → create branch → implement change → commit → push → explain workflow."],
+["Responsive UI",10,"Desktop/tablet/mobile layout accuracy, spacing, typography, handling overflow.","Recreate provided screenshot at desktop and mobile widths. Test across viewports."],
+["Debugging / Execution",10,"Identifies technical errors proactively rather than waiting for external assistance.","Provide deliberately broken website with 5–7 active bugs: Find and fix all problems."],
+["Deployment",5,"Deploys app, configures environment variables, connects hosting/domain, verifies production.","Simple app: Deploy to target platform, configure env variables, deliver live URL."],
+["Learning New Tech",5,"Quickly grasps unfamiliar tools/frameworks and applies them effectively.","Give unfamiliar tool: You have 60–90 min. Learn enough to build this feature."]]},
+{name:"Problem Solving",items:[
+["Debugging Root Cause",25,"Identifies systemic root cause instead of making random code edits.","Provide broken auth: The login system is failing. Identify root cause and fix it."],
+["Requirement Understanding",15,"Grasps true client needs; proactively flags missing or contradictory information.","Provide brief with intentional ambiguity: List all clarification questions for client."],
+["Independent Problem Solving",20,"Researches and investigates independently before escalating issues to senior staff.","Unfamiliar technical bug with docs available: Solve without direct human assistance."],
+["Research & Investigation",10,"Finds reliable sources and compares technical trade-offs across solutions.","Research 3 approaches to implement feature X. Recommend one and justify choice."],
+["Solution Quality",15,"Delivers functional, maintainable code without creating technical debt.","Present 2–3 architectural options: Choose best approach, justify, and implement."],
+["Handling Unexpected Problems",10,"Maintains composure and adapts when scope, tools, or environments shift.","Introduce live mid-test change: Client now requires mobile support. Adapt solution."],
+["Learning From Mistakes",5,"Recognizes mistakes, understands underlying reasons, prevents recurrence.","Review past error: Explain what caused this defect and how you will prevent it next time."]]},
+{name:"Professional Collaboration",items:[
+["Teamwork",20,"Aligns with team goals, shares knowledge, avoids creating interpersonal friction.","Place candidate in a 2–3 person mini project with shared tight deadline; observe dynamics."],
+["Git / Team Workflow",15,"Collaborates smoothly in shared repos, resolves merge conflicts, follows PR rules.","Assign 2–3 developers to single repo: complete distinct features using branches/PRs."],
+["Responsibility",15,"Takes full ownership of assigned tasks without shifting blame for failures.","Assign task with strict deadline: observe execution, proactive blocker updates, ownership."],
+["Working With Designers",10,"Translates design files accurately and communicates technical constraints professionally.","Provide Figma file: Review pre-development. List technical concerns and design questions."],
+["Working With Developers",10,"Coordinates API contracts and dependencies clearly with peer engineers.","Assign feature dependent on peer API: observe contract negotiation and coordination."],
+["Receiving Feedback",10,"Accepts code reviews constructively without defensiveness and applies fixes.","Perform code review with 5 required corrections; monitor attitude and implementation."],
+["Helping Team Members",10,"Guides peers effectively by explaining concepts rather than doing work for them.","Allow candidate to assist struggling peer: evaluate if they mentor or over-write code."],
+["Conflict Handling",10,"Resolves technical or priority disagreements constructively and professionally.","Scenario: Designer demands X, engineer claims X impossible, deadline tomorrow. Resolve."]]},
+{name:"Communication & Client Readiness",items:[
+["Requirement Clarification",20,"Listens actively, asks targeted questions, confirms requirements before building.","Mock client brief call: ask candidate to compile comprehensive technical discovery list."],
+["Client Communication",20,"Demonstrates confidence, clarity, poise, and professional decorum on client calls.","10-min mock call: Assessor acts as challenging client introducing scope creep and questions."],
+["Professional Messaging",15,"Writes clear, structured, respectful, and actionable text updates (Slack/Email).","Provide scenarios: draft updates for delay, requirement check, completion, and blocker."],
+["Technical Explanation",15,"Translates complex technical concepts into accessible business language.","Task: Explain Firebase Authentication and security rules to a non-technical client."],
+["Project Updates",10,"Delivers informative, structured progress reports instead of vague assurances.","Simulated 3-day project: submit end-of-day progress logs for Day 1, Day 2, and Day 3."],
+["Presentation / Demo",10,"Presents finished features clearly, walking through logic and user impact.","Deliver 5-minute client-style demonstration of a completed mini project."],
+["Handling Questions",10,"Responds to unexpected client inquiries calmly, accurately, and without defensiveness.","Post-demo Q&A: fire 5 unexpected technical/business questions and evaluate poise."]]},
+{name:"Professional Reliability",items:[
+["Deadline Performance",25,"Consistently delivers assigned tasks on or before agreed deadlines.","Assign timed task with hard submission deadline. Track exact delivery timestamps."],
+["Responsiveness",15,"Acknowledges critical communications promptly; remains reachable during hours.","Issue async communication prompts across test window; log response latencies."],
+["Consistent Updates",15,"Provides regular progress reports automatically without management chasing.","3-day mini project: verify whether daily status logs arrive automatically."],
+["Ownership & Follow-through",15,"Takes full responsibility for execution; resolves open issues proactively.","Provide incomplete task description; evaluate if candidate clarifies and closes independently."],
+["Process Compliance",10,"Follows Git conventions, QC checklists, naming formats, and submission steps.","Audit submission against Intellex Workflow Standards across 10 compliance points."],
+["QC / Correction Discipline",10,"Eliminates sloppy errors; addresses QC feedback thoroughly in second submission.","Track number and recurrence rate of defects across initial QC and resubmission cycles."],
+["Commitment & Attendance",5,"Attends scheduled sessions reliably; provides advance notice if absent.","Track punctuality and attendance across 5 mandatory operational checkpoints."],
+["Professional Behavior",5,"Exhibits honesty, accountability, respect, and ethical conduct under pressure.","Scenario: A mistake on your end caused client outage. How do you communicate this?"]]}
+];
+const bands=[["Unsatisfactory","0–20%"],["Heavy Guidance","21–40%"],["Basic Ability","41–60%"],["Autonomous Standard","61–75%"],["Strong Independent","76–85%"],["Exceptional / Lead","86–100%"]];
+let rubric=load("intellex_rubric",initial), students=load("intellex_students",[]);
+let current=null;
+function load(k,d){try{return JSON.parse(localStorage.getItem(k))||structuredClone(d)}catch(e){return structuredClone(d)}}
+function persist(){localStorage.setItem("intellex_rubric",JSON.stringify(rubric));localStorage.setItem("intellex_students",JSON.stringify(students))}
+function uid(){return Math.random().toString(36).slice(2,10)}
+function addStudent(){let n=prompt("Enter student name:");if(!n||!n.trim())return;students.push({id:uid(),name:n.trim(),marks:{},comments:{},created:new Date().toISOString()});persist();renderDashboard()}
+function editStudent(id){let s=students.find(x=>x.id===id),n=prompt("Edit student name:",s.name);if(n&&n.trim()){s.name=n.trim();persist();renderDashboard()}}
+function deleteStudent(id){let s=students.find(x=>x.id===id);if(confirm("Delete "+s.name+" and their assessment? This cannot be undone.")){students=students.filter(x=>x.id!==id);persist();renderDashboard()}}
+function totalMax(){return rubric.reduce((a,c)=>a+c.items.reduce((b,i)=>b+Number(i[1]),0),0)}
+function stats(s){let done=0,score=0,max=0;rubric.forEach((c,ci)=>c.items.forEach((it,ii)=>{let v=s.marks[ci+"-"+ii];if(v!==undefined&&v!==null&&v!==""){done++;score+=Number(v)}max+=Number(it[1])}));return{done,score,max,pct:rubric.reduce((a,c)=>a+c.items.length,0)?done/rubric.reduce((a,c)=>a+c.items.length,0)*100:0}}
+function showPage(p){["dashboard","assessment","rubric"].forEach(x=>{document.getElementById("page-"+x).classList.toggle("hidden",x!==p);document.getElementById("nav-"+x).classList.toggle("active",x===p)});if(p==="dashboard")renderDashboard();if(p==="rubric")renderRubric()}
+function renderDashboard(){let completed=0,sum=0,scored=0;students.forEach(s=>{let st=stats(s);if(st.done===rubric.reduce((a,c)=>a+c.items.length,0))completed++;if(st.done){sum+=st.score;scored++}});document.getElementById("m-students").textContent=students.length;document.getElementById("m-completed").textContent=completed;document.getElementById("m-pending").textContent=students.length-completed;document.getElementById("m-average").textContent=scored?(sum/scored/totalMax()*10).toFixed(2)+"/10":"—";
+let el=document.getElementById("students");el.innerHTML=students.length?"":"<div class='empty'>No students yet. Select Add student to begin.</div>";
+students.forEach(s=>{let st=stats(s),done=st.done===rubric.reduce((a,c)=>a+c.items.length,0);el.insertAdjacentHTML("beforeend",`<div class="student"><div><strong>${esc(s.name)}</strong><small>${st.done}/${rubric.reduce((a,c)=>a+c.items.length,0)} criteria assessed · ${st.score}/${totalMax()} marks</small></div><div class="row"><span class="pill ${done?'done':'pending'}">${done?'Completed':'In progress'}</span><button class="small" onclick="openAssessment('${s.id}')">Open</button><button class="small secondary" onclick="exportStudentCSV('${s.id}')">Download marks</button><button class="small secondary" onclick="editStudent('${s.id}')">Edit</button><button class="small danger" onclick="deleteStudent('${s.id}')">Delete</button></div></div>`)});
+}
+function esc(x){return String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function openAssessment(id){current=id;showPage("assessment");renderAssessment()}
+function renderAssessment(){let s=students.find(x=>x.id===current);if(!s)return;document.getElementById("assess-title").textContent=s.name;document.getElementById("assess-subtitle").textContent="Individual assessment · "+new Date().toLocaleDateString();let html="";
+rubric.forEach((cat,ci)=>{let cs=0,cd=0,cm=0;cat.items.forEach((it,ii)=>{let v=s.marks[ci+"-"+ii];cm+=Number(it[1]);if(v!==undefined&&v!==null&&v!==""){cs+=Number(v);cd++}});html+=`<div class="category"><div class="cathead" onclick="this.nextElementSibling.classList.toggle('hidden')"><h3>${ci+1}. ${esc(cat.name)}</h3><span class="score">${cs}/${cm} · ${cd}/${cat.items.length} assessed　⌄</span></div><div class="catbody">`;
+cat.items.forEach((it,ii)=>{let key=ci+"-"+ii,v=s.marks[key],comment=s.comments[key]||"";html+=`<div class="criterion"><div class="row between"><h4>${ii+1}. ${esc(it[0])}</h4><span class="pill">Max ${Number(it[1])}</span></div><div class="desc">${esc(it[2])}</div><details><summary>Fallback assessment task</summary><p>${esc(it[3])}</p></details><details><summary>Performance scoring guidelines</summary><p>${bands.map(b=>b[0]+" — "+b[1]).join("<br>")}</p><p class="muted">Use the percentage band against this criterion's maximum marks. The PDF gives explicit example scales for Execution /25 and Git /10.</p></details><div class="entry"><div class="field"><label>Marks / ${Number(it[1])}</label><input type="number" min="0" max="${Number(it[1])}" step="0.5" placeholder="Not assessed" value="${v??''}" onchange="setMark('${key}',this.value,${Number(it[1])})"></div><div class="field"><label>Evaluator comments (optional)</label><input value="${esc(comment)}" placeholder="Add observation..." onchange="setComment('${key}',this.value)"></div></div></div>`});html+="</div></div>"});document.getElementById("assessment-content").innerHTML=html;updateTotals()}
+function setMark(key,val,max){let s=students.find(x=>x.id===current);if(val===""){delete s.marks[key]}else{let n=Number(val);if(!Number.isFinite(n)||n<0||n>max){alert("Enter a number from 0 to "+max);renderAssessment();return}s.marks[key]=n}persist();updateTotals();renderDashboard()}
+function setComment(key,val){let s=students.find(x=>x.id===current);s.comments[key]=val;persist()}
+function updateTotals(){let s=students.find(x=>x.id===current),st=stats(s),count=rubric.reduce((a,c)=>a+c.items.length,0),complete=st.done===count;document.getElementById("overall").textContent=st.score+" / "+totalMax();document.getElementById("overall-status").textContent=complete?"Assessment complete":"NOT COMPLETE · "+(count-st.done)+" criteria not assessed";document.getElementById("qr").textContent=complete?(st.score/totalMax()*10).toFixed(1)+" / 10":"Pending";document.getElementById("overall-progress").style.width=st.pct+"%"}
+function renderRubric(){let el=document.getElementById("rubric-editor");el.innerHTML=rubric.map((c,ci)=>`<div class="category"><div class="cathead"><h3>${ci+1}. ${esc(c.name)} · ${c.items.reduce((a,i)=>a+Number(i[1]),0)} marks</h3><button class="small secondary" onclick="editCategory(${ci})">Edit category</button></div><div class="catbody">${c.items.map((it,ii)=>`<div class="criterion"><div class="row between"><strong>${esc(it[0])} · /${it[1]}</strong><button class="small secondary" onclick="editCriterion(${ci},${ii})">Edit criterion</button></div><div class="muted">${esc(it[2])}</div></div>`).join("")}<button class="small secondary" onclick="addCriterion(${ci})">＋ Add criterion</button></div></div>`).join("")}
+function editCategory(ci){let n=prompt("Category name:",rubric[ci].name);if(n&&n.trim()){rubric[ci].name=n.trim();renderRubric()}}
+function editCriterion(ci,ii){let it=rubric[ci].items[ii],name=prompt("Criterion name:",it[0]);if(name===null)return;let max=prompt("Maximum marks:",it[1]);if(max===null)return;let desc=prompt("What to monitor / explanation:",it[2]);if(desc===null)return;let fallback=prompt("Fallback assessment task:",it[3]);if(fallback===null)return;if(!name.trim()||!Number.isFinite(Number(max))||Number(max)<=0){alert("Enter a name and positive maximum marks.");return}rubric[ci].items[ii]=[name.trim(),Number(max),desc,fallback];renderRubric()}
+function addCriterion(ci){let name=prompt("New criterion name:");if(!name)return;let max=Number(prompt("Maximum marks:","10"));if(!Number.isFinite(max)||max<=0)return;let desc=prompt("Evaluation explanation:","");let fb=prompt("Fallback assessment task:","");rubric[ci].items.push([name,max,desc||"",fb||""]);renderRubric()}
+function saveRubric(){persist();alert("Assessment rubric saved. Student marks have been retained.");renderDashboard();if(current)renderAssessment()}
+function backup(){let blob=new Blob([JSON.stringify({rubric,students},null,2)],{type:"application/json"});download(blob,"intellex-assessment-backup.json")}
+function restore(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d.rubric)||!Array.isArray(d.students))throw Error();if(confirm("Replace current data with this backup?")){rubric=d.rubric;students=d.students;persist();renderDashboard();alert("Backup restored.")}}catch(err){alert("Invalid backup file.")}};r.readAsText(f)}
+function exportCSV(){let rows=[["Student","Category","Criterion","Marks","Maximum","Status","Comments"]];students.forEach(s=>rubric.forEach((c,ci)=>c.items.forEach((it,ii)=>{let k=ci+"-"+ii,v=s.marks[k];rows.push([s.name,c.name,it[0],v??"",it[1],v===undefined?"NOT ASSESSED":"ASSESSED",s.comments[k]||""])})));let csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(",")).join("\r\n");download(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}),"intellex-all-students-marks.csv")}
+function exportStudentCSV(id){
+ let s=students.find(x=>x.id===id);if(!s)return;
+ let rows=[
+  ["Intellex Student Assessment Report"],
+  ["Student",s.name],
+  ["Assessment date",new Date().toLocaleDateString()],
+  ["Total marks",stats(s).score],
+  ["Maximum marks",totalMax()],
+  ["Criteria assessed",stats(s).done+"/"+rubric.reduce((a,c)=>a+c.items.length,0)],
+  [],
+  ["Category","Category subtotal","Criterion","Maximum marks","Marks awarded","Status","Evaluation explanation","Fallback assessment task","Evaluator comments"]
+ ];
+ rubric.forEach((c,ci)=>{
+  let categoryScore=0,categoryMax=0;
+  c.items.forEach((it,ii)=>{let v=s.marks[ci+"-"+ii];categoryMax+=Number(it[1]);if(v!==undefined&&v!==null&&v!=="")categoryScore+=Number(v)});
+  c.items.forEach((it,ii)=>{
+   let key=ci+"-"+ii,v=s.marks[key],assessed=v!==undefined&&v!==null&&v!=="";
+   rows.push([c.name,categoryScore+"/"+categoryMax,it[0],it[1],assessed?v:"",assessed?"ASSESSED":"NOT ASSESSED",it[2]||"",it[3]||"",s.comments[key]||""]);
+  });
+ });
+ let csv=rows.map(r=>r.map(x=>'"'+String(x??"").replace(/"/g,'""')+'"').join(",")).join("\\r\\n");
+ let safeName=s.name.replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"")||"student";
+ download(new Blob(["\\ufeff"+csv],{type:"text/csv;charset=utf-8"}),"intellex-"+safeName+"-marks.csv");
+}
+function download(blob,name){let a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+renderDashboard();
+</script>
+</body></html>
